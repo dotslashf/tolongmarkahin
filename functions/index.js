@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const crypto = require('crypto');
 const { onEvent } = require('./utils/parser');
+const { validateSignature } = require('./utils/common');
 
 exports.webhook = functions.https.onRequest((req, res) => {
   if (req.method === 'GET') {
@@ -24,7 +25,7 @@ exports.webhook = functions.https.onRequest((req, res) => {
 
   if (req.method === 'POST') {
     try {
-      if (!validateSignature(req.headers, body)) {
+      if (!validateSignature(req.headers, req.body)) {
         console.error('Invalid signature');
         return;
       }
