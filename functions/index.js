@@ -1,9 +1,6 @@
 const functions = require('firebase-functions');
 const crypto = require('crypto');
-
-const config = {
-  consumer_secret: functions.config().twitter.consumer_secret,
-};
+const { onEvent } = require('./utils/parser');
 
 exports.webhook = functions.https.onRequest((req, res) => {
   if (req.method === 'GET') {
@@ -16,10 +13,7 @@ exports.webhook = functions.https.onRequest((req, res) => {
     }
 
     const hmac = crypto
-      .createHmac(
-        'sha256',
-        'Z5jA8DrBijrR0p3BtnU6H3ZfqITBaMk7DVLKu7yfcv3dIgfDl3'
-      )
+      .createHmac('sha256', process.env.TWITTER_CONSUMER_SECRET)
       .update(crcToken)
       .digest('base64');
 
@@ -27,8 +21,18 @@ exports.webhook = functions.https.onRequest((req, res) => {
       response_token: `sha256=${hmac}`,
     });
   }
+
   if (req.method === 'POST') {
-    console.log(req.body);
-    return res.status(200).json({ status: 'OK' });
+    try {
+      if (!validateSignature(req.headers, body)) {
+        console.error('Invalid signature');
+        return;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    onEvent(req.body);
+    return res.status(200).json({ status: 'Ok' });
   }
 });
