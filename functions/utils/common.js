@@ -1,9 +1,5 @@
 const crypto = require('crypto');
 
-function fixChar(obj) {
-  return JSON.stringify(obj).replace(/\//g, '\\/');
-}
-
 function validateSignature(header, body) {
   const signatureHeaderName = 'x-twitter-webhooks-signature';
 
@@ -17,7 +13,7 @@ function validateSignature(header, body) {
     'sha256=' +
     crypto
       .createHmac('sha256', process.env.TWITTER_CONSUMER_SECRET)
-      .update(fixChar(body))
+      .update(body.toString())
       .digest('base64');
 
   return crypto.timingSafeEqual(

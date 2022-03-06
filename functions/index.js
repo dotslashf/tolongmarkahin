@@ -25,7 +25,7 @@ exports.webhook = functions.https.onRequest((req, res) => {
 
   if (req.method === 'POST') {
     try {
-      if (!validateSignature(req.headers, req.body)) {
+      if (!validateSignature(req.headers, req.rawBody)) {
         console.error('Invalid signature');
         return;
       }
