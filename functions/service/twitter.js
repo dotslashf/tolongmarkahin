@@ -11,24 +11,28 @@ class Twitter {
     });
   }
 
-  sendDirectMessage(direct_message_events, messageText) {
+  getLastMessage(direct_message_events) {
+    const message = direct_message_events.shift();
+
+    if (
+      typeof message === 'undefined' ||
+      typeof message.message_create === 'undefined'
+    ) {
+      return reject(new Error('Invalid message'));
+    }
+
+    if (
+      message.message_create.sender_id ===
+      message.message_create.target.recipient_id
+    ) {
+      return reject(new Error('Dont reply to yourself'));
+    }
+
+    return message;
+  }
+
+  sendDirectMessage(senderId, messageText) {
     return new Promise((resolve, reject) => {
-      const message = direct_message_events.shift();
-
-      if (
-        typeof message === 'undefined' ||
-        typeof message.message_create === 'undefined'
-      ) {
-        return reject(new Error('Invalid message'));
-      }
-
-      if (
-        message.message_create.sender_id ===
-        message.message_create.target.recipient_id
-      ) {
-        return reject(new Error('Dont reply to yourself'));
-      }
-
       this.client.post(
         'direct_messages/events/new',
         {
