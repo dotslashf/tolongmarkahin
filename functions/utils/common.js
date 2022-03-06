@@ -22,6 +22,26 @@ function validateSignature(header, body) {
   );
 }
 
+function getBookmarkUrls(message) {
+  const urls = message.message_create.message_data.entities.urls;
+  return {
+    length: urls.length,
+    urls: urls.map(url => url.expanded_url),
+  };
+}
+
+function getCommand(message) {
+  const text = message.message_create.message_data.text;
+  console.log(text);
+  const commands = ['/addFolder', '/tambahFolder'];
+  return commands.filter(c => {
+    const re = new RegExp(`^${c} `);
+    return text.match(re);
+  })[0];
+}
+
 module.exports = {
   validateSignature,
+  getBookmarkUrls,
+  getCommand,
 };
