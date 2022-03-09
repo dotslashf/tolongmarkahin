@@ -1,5 +1,5 @@
 const { logger } = require('firebase-functions');
-const { getBookmarkUrls, getCommand } = require('./common');
+const { getBookmarkObject, getCommand } = require('./common');
 const Twitter = require('../service/twitter');
 
 async function onEvent(firestore, body) {
@@ -12,12 +12,20 @@ async function onEvent(firestore, body) {
   const message = twitter.getLastMessage(direct_message_events);
   const command = getCommand(message);
 
-  if (command === '/addFolder' || command === '/tambahFolder') {
-    console.log('bikin folder');
-    await firestore.createFolder(message);
+  try {
+    if (command === '/addFolder' || command === '/tambahFolder') {
+      console.log('bikin folder');
+      await firestore.createFolder(message);
+    }
+
+    const { length, tweets } = getBookmarkObject(message);
+    tweets.forEach(async tweet => {
+      const t = await twitter.checkTweetBookmark(tweet.tweetId);
+      await firestore.addBookmark(message, 'anjay', t);
+    });
+  } catch (e) {
+    logger.error(e);
   }
-  // const { length, urls } = getBookmarkUrls(message);
-  // logger.log(length, urls);
 
   // await firestore.getData();
 

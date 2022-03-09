@@ -19,10 +19,28 @@ class Firestore {
     const folderName = message.message_create.message_data.text.split(' ')[1];
     const docRef = this.db.collection('bookmarks').doc(userId);
     const docs = await docRef.get();
-    
+
     // await docRef.update({
     //   [folderName]: [],
     // });
+  }
+
+  async addBookmark(message, folderName, bookmark) {
+    if (!folderName) {
+      folderName = 'general';
+    }
+    const userId = message.message_create.sender_id;
+    const docRef = await this.db
+      .collection('bookmarks')
+      .doc(userId)
+      .collection(folderName)
+      .get();
+
+    await this.db
+      .collection('bookmarks')
+      .doc(userId)
+      .collection(folderName)
+      .add(bookmark);
   }
 
   async getData() {

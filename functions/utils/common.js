@@ -22,11 +22,16 @@ function validateSignature(header, body) {
   );
 }
 
-function getBookmarkUrls(message) {
+function getBookmarkObject(message) {
   const urls = message.message_create.message_data.entities.urls;
   return {
     length: urls.length,
-    urls: urls.map(url => url.expanded_url),
+    tweets: urls.map(url => {
+      return {
+        url: url.expanded_url,
+        tweetId: url.expanded_url.match(/status\/(\d*)/)[1],
+      };
+    }),
   };
 }
 
@@ -42,6 +47,6 @@ function getCommand(message) {
 
 module.exports = {
   validateSignature,
-  getBookmarkUrls,
+  getBookmarkObject,
   getCommand,
 };
