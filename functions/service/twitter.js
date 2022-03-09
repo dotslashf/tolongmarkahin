@@ -31,6 +31,26 @@ class Twitter {
     return message;
   }
 
+  checkTweetBookmark(tweetId) {
+    return new Promise((resolve, reject) => {
+      this.client.get(
+        'statuses/show',
+        {
+          id: tweetId,
+          include_entities: true,
+          tweet_mode: 'extended',
+        },
+        (err, data) => {
+          if (err) {
+            console.error(err);
+            return reject(err);
+          }
+          return resolve(data);
+        }
+      );
+    });
+  }
+
   sendDirectMessage(senderId, messageText) {
     return new Promise((resolve, reject) => {
       this.client.post(
