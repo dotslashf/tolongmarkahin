@@ -42,7 +42,13 @@ function getBookmarkObject(message) {
 }
 
 function getCommand(text) {
-  const commands = ['/createFolder', '/buatFolder', '/+folder'];
+  const commands = [
+    '/createFolder',
+    '/buatFolder',
+    '/+folder',
+    '/ke',
+    '/keFolder',
+  ];
   return commands.filter(c => {
     const re = new RegExp(`^${c.replace(/([+?])/g, '\\$1')} `);
     return text.match(re);
