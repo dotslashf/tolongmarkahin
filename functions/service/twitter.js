@@ -1,4 +1,5 @@
 const Twit = require('twit');
+const { logger } = require('firebase-functions');
 require('dotenv').config();
 
 class Twitter {
@@ -51,7 +52,7 @@ class Twitter {
     });
   }
 
-  sendDirectMessage(senderId, messageText) {
+  sendDirectMessage(userId, messageText) {
     return new Promise((resolve, reject) => {
       this.client.post(
         'direct_messages/events/new',
@@ -60,7 +61,7 @@ class Twitter {
             type: 'message_create',
             message_create: {
               target: {
-                recipient_id: message.message_create.sender_id,
+                recipient_id: userId,
               },
               message_data: {
                 text: messageText,
@@ -73,6 +74,7 @@ class Twitter {
             console.error(err);
             return reject(err);
           }
+          logger.info('sendDirectMessage', data);
           return resolve(data);
         }
       );
