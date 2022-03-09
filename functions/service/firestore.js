@@ -14,33 +14,45 @@ class Firestore {
     this.db = admin.firestore();
   }
 
-  async createFolder(message) {
-    const userId = message.message_create.sender_id;
-    const folderName = message.message_create.message_data.text.split(' ')[1];
-    const docRef = this.db.collection('bookmarks').doc(userId);
-    const docs = await docRef.get();
-
-    // await docRef.update({
-    //   [folderName]: [],
-    // });
+  async createFolder(userId, folderName) {
+    try {
+      await this.db
+        .collection('bookmarks')
+        .doc(userId)
+        .collection(folderName)
+        .add({
+          createdAt: new Date(),
+          tweet: {
+            text: 'dummy text',
+          },
+        });
+      logger.info(`success createFolder: ${userId} ${folderName}`);
+    } catch (e) {
+      logger.error(e);
+    }
   }
 
-  async addBookmark(message, folderName, bookmark) {
-    if (!folderName) {
-      folderName = 'general';
-    }
-    const userId = message.message_create.sender_id;
+  async isFolderExist(userId, folderName) {
     const docRef = await this.db
       .collection('bookmarks')
       .doc(userId)
       .collection(folderName)
       .get();
+    return !docRef.empty;
+  }
 
+  async addBookmark(userId, folderName, bookmark) {
+    if (!folderName) {
+      folderName = 'general';
+    }
     await this.db
       .collection('bookmarks')
       .doc(userId)
       .collection(folderName)
-      .add(bookmark);
+      .add({
+        createdAt: new Date(),
+        tweet: bookmark,
+      });
   }
 
   async getData() {
