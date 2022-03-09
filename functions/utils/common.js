@@ -1,14 +1,5 @@
 const crypto = require('crypto');
-
-const commands = [
-  { command: '/createFolder', description: 'Membuat folder' },
-  { command: '/buatFolder', description: 'Sama dengan /createFolder' },
-  { command: '/+folder', description: 'Sama dengan /createFolder' },
-  { command: '/ke', description: 'Menaruh bookmark pada folder yang spesifik' },
-  { command: '/keFolder', description: 'Sama dengan /ke' },
-  { command: '/listFolder', description: 'Memunculkan list folder bookmark' },
-  { command: '/listCommands', description: 'Menampilkan pesan ini' },
-];
+const { commands } = require('../constants/index');
 
 function validateSignature(header, body) {
   const signatureHeaderName = 'x-twitter-webhooks-signature';
@@ -60,13 +51,20 @@ function getCommand(text) {
   return resultCommand ? resultCommand.command : null;
 }
 
-function returnCommandsInfo() {
-  return commands.map(c => `-> ${c.command} | ${c.description}`).join('\n');
+function formatCommandsHelp() {
+  return commands
+    .map(
+      c =>
+        `👉🏻 ${c.command}${c.help !== '' ? `\n❓ ${c.help}` : ''}\nℹ️ ${
+          c.description
+        }`
+    )
+    .join('\n\n');
 }
 
 module.exports = {
   validateSignature,
   getBookmarkObject,
   getCommand,
-  returnCommandsInfo,
+  formatCommandsHelp,
 };

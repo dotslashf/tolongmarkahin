@@ -2,7 +2,7 @@ const { logger } = require('firebase-functions');
 const {
   getBookmarkObject,
   getCommand,
-  returnCommandsInfo,
+  formatCommandsHelp,
 } = require('./common');
 const Twitter = require('../service/twitter');
 const Firestore = require('../service/firestore');
@@ -33,7 +33,7 @@ async function onEvent(firestore, body) {
     }
 
     // buat folder baru
-    if (['/createFolder', '/buatFolder', '/+folder'].includes(command)) {
+    if (['/createFolder', '/buatFolder'].includes(command)) {
       const isFolderExist = await firestore.isFolderExist(userId, folderName);
       if (isFolderExist) {
         return twitter.sendDirectMessage(
@@ -50,7 +50,7 @@ async function onEvent(firestore, body) {
     }
 
     // add bookmark ke folder
-    if (['/ke', '/keFolder'].includes(command)) {
+    if (['/ke', '/to'].includes(command)) {
       const isFolderExist = await firestore.isFolderExist(userId, folderName);
       if (!isFolderExist) {
         await firestore.createFolder(userId, folderName);
@@ -72,10 +72,10 @@ async function onEvent(firestore, body) {
     }
 
     // list commands
-    if (['/listCommands'].includes(command)) {
+    if (['/help'].includes(command)) {
       await twitter.sendDirectMessage(
         userId,
-        `List command:\n\n${returnCommandsInfo()}`
+        `List command:\n\n${formatCommandsHelp()}`
       );
       return;
     }
