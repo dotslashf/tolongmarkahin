@@ -1,7 +1,14 @@
 const { logger } = require('firebase-functions');
 const { getBookmarkObject, getCommand } = require('./common');
 const Twitter = require('../service/twitter');
+const Firestore = require('../service/firestore');
 
+/**
+ *
+ * @param {Firestore} firestore | Firestore object class
+ * @param {*} body
+ * @returns
+ */
 async function onEvent(firestore, body) {
   const { direct_message_events } = body;
   if (!direct_message_events) {
@@ -10,18 +17,29 @@ async function onEvent(firestore, body) {
 
   const twitter = new Twitter();
   const message = twitter.getLastMessage(direct_message_events);
-  const command = getCommand(message);
 
   try {
-    if (command === '/addFolder' || command === '/tambahFolder') {
-      console.log('bikin folder');
-      await firestore.createFolder(message);
+    const { length, tweets, userId, folderName, text } =
+      getBookmarkObject(message);
+    const command = getCommand(text);
+    logger.info(command);
+
+    if (['/createFolder', '/buatFolder', '/+folder'].includes(command)) {
+      await firestore.createFolder(userId, folderName);
+      await twitter.sendDirectMessage(
+        userId,
+        `Folder ${folderName} telah ditambahkan`
+      );
+      return;
     }
 
-    const { length, tweets } = getBookmarkObject(message);
+    const isFolderExist = await firestore.isFolderExist(userId, folderName);
+    if (!isFolderExist) {
+      await firestore.createFolder(userId, folderName);
+    }
     tweets.forEach(async tweet => {
       const t = await twitter.checkTweetBookmark(tweet.tweetId);
-      await firestore.addBookmark(message, 'anjay', t);
+      await firestore.addBookmark(userId, folderName, t);
     });
   } catch (e) {
     logger.error(e);
