@@ -22,7 +22,6 @@ async function onEvent(firestore, body) {
     const { length, tweets, userId, folderName, text } =
       getBookmarkObject(message);
     const command = getCommand(text);
-    logger.info(command);
 
     if (['/createFolder', '/buatFolder', '/+folder'].includes(command)) {
       await firestore.createFolder(userId, folderName);
@@ -33,13 +32,35 @@ async function onEvent(firestore, body) {
       return;
     }
 
-    const isFolderExist = await firestore.isFolderExist(userId, folderName);
-    if (!isFolderExist) {
-      await firestore.createFolder(userId, folderName);
+    if (['/ke', '/keFolder'].includes(command)) {
+      const isFolderExist = await firestore.isFolderExist(userId, folderName);
+      if (!isFolderExist) {
+        await firestore.createFolder(userId, folderName);
+        await twitter.sendDirectMessage(
+          userId,
+          `Folder ${folderName} telah ditambahkan`
+        );
+      }
+
+      tweets.forEach(async tweet => {
+        const t = await twitter.checkTweetBookmark(tweet.tweetId);
+        await firestore.addBookmark(userId, folderName, t);
+      });
+      await twitter.sendDirectMessage(
+        userId,
+        `${length} bookmark telah ditambahkan ke ${folderName}`
+      );
+      return;
     }
+
     tweets.forEach(async tweet => {
       const t = await twitter.checkTweetBookmark(tweet.tweetId);
       await firestore.addBookmark(userId, folderName, t);
+      await twitter.sendDirectMessage(
+        userId,
+        `${length} bookmark telah ditambahkan ke ${folderName}`
+      );
+      return;
     });
   } catch (e) {
     logger.error(e);
