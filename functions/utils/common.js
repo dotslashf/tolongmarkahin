@@ -55,7 +55,7 @@ function formatCommandsHelp() {
   return commands
     .map(
       c =>
-        `👉🏻 ${c.command}${c.help !== '' ? `\n❓ ${c.help}` : ''}\nℹ️ ${
+        `💡 ${c.command}${c.help !== '' ? `\n❓ ${c.help}` : ''}\nℹ️ ${
           c.description
         }`
     )

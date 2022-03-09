@@ -1,5 +1,6 @@
 const Twit = require('twit');
 const { logger } = require('firebase-functions');
+const { formatCommandsHelp } = require('../utils/common');
 require('dotenv').config();
 
 class Twitter {
@@ -52,7 +53,26 @@ class Twitter {
     });
   }
 
-  sendDirectMessage(userId, messageText) {
+  sendDirectMessage({ userId, type, folderName, length }) {
+    let msg = '';
+    switch (type) {
+      case 'tambahFolder':
+        msg = `✨ folder ${folderName} berhasil ditambahkan`;
+        break;
+      case 'folderExist':
+        msg = `🤔 folder ${folderName} sudah ada, gak mungkin double dong`;
+        break;
+      case 'tambahBookmark':
+        msg = `✨ ${length} bookmark telah ditambahkan ke ${folderName}`;
+        break;
+      case 'help':
+        msg = `🔮 List command:\n\n${formatCommandsHelp()}`;
+        break;
+      case 'error':
+        msg = `💀 ada yang salah`;
+        break;
+    }
+
     return new Promise((resolve, reject) => {
       this.client.post(
         'direct_messages/events/new',
@@ -64,7 +84,7 @@ class Twitter {
                 recipient_id: userId,
               },
               message_data: {
-                text: messageText,
+                text: msg,
               },
             },
           },

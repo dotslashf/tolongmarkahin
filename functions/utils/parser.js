@@ -1,9 +1,5 @@
 const { logger } = require('firebase-functions');
-const {
-  getBookmarkObject,
-  getCommand,
-  formatCommandsHelp,
-} = require('./common');
+const { getBookmarkObject, getCommand } = require('./common');
 const Twitter = require('../service/twitter');
 const Firestore = require('../service/firestore');
 
@@ -36,16 +32,18 @@ async function onEvent(firestore, body) {
     if (['/createFolder', '/buatFolder'].includes(command)) {
       const isFolderExist = await firestore.isFolderExist(userId, folderName);
       if (isFolderExist) {
-        return twitter.sendDirectMessage(
+        return twitter.sendDirectMessage({
           userId,
-          `Folder ${folderName} sudah ada, silahkan gunakan nama lain`
-        );
+          type: 'folderExist',
+          folderName,
+        });
       }
       await firestore.createFolder(userId, folderName);
-      await twitter.sendDirectMessage(
+      await twitter.sendDirectMessage({
         userId,
-        `Folder ${folderName} telah ditambahkan`
-      );
+        type: 'tambahFolder',
+        folderName,
+      });
       return;
     }
 
@@ -54,29 +52,29 @@ async function onEvent(firestore, body) {
       const isFolderExist = await firestore.isFolderExist(userId, folderName);
       if (!isFolderExist) {
         await firestore.createFolder(userId, folderName);
-        await twitter.sendDirectMessage(
+        await twitter.sendDirectMessage({
           userId,
-          `Folder ${folderName} telah ditambahkan`
-        );
+          type: 'tambahFolder',
+          folderName,
+        });
       }
 
       tweets.forEach(async tweet => {
         const t = await twitter.checkTweetBookmark(tweet.tweetId);
         await firestore.addBookmark(userId, folderName, t);
       });
-      await twitter.sendDirectMessage(
+      await twitter.sendDirectMessage({
         userId,
-        `${length} bookmark telah ditambahkan ke ${folderName}`
-      );
+        type: 'tambahBookmark',
+        length,
+        folderName,
+      });
       return;
     }
 
     // list commands
     if (['/help'].includes(command)) {
-      await twitter.sendDirectMessage(
-        userId,
-        `List command:\n\n${formatCommandsHelp()}`
-      );
+      await twitter.sendDirectMessage({ userId, type: 'help' });
       return;
     }
 
@@ -92,18 +90,8 @@ async function onEvent(firestore, body) {
     });
   } catch (e) {
     logger.error('onEvent', e);
-    await twitter.sendDirectMessage(
-      userId,
-      'Ada yang salah pada commands, coba ketik untuk mengecek /listCommands'
-    );
+    await twitter.sendDirectMessage({ userId, type: 'error' });
   }
-
-  // await firestore.getData();
-
-  // await twitter.sendDirectMessage(
-  //   direct_message_events,
-  //   `Anjim luh banh mau bikin memekfess ya`
-  // );
 }
 
 module.exports = {
