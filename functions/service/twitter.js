@@ -74,7 +74,6 @@ class Twitter {
             console.error(err);
             return reject(err);
           }
-          logger.info('sendDirectMessage', data);
           return resolve(data);
         }
       );
