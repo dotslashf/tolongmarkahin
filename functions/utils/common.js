@@ -24,8 +24,14 @@ function validateSignature(header, body) {
 
 function getBookmarkObject(message) {
   const urls = message.message_create.message_data.entities.urls;
+  const userId = message.message_create.sender_id;
+  const folderName = message.message_create.message_data.text.split(' ')[1];
+  const text = message.message_create.message_data.text;
   return {
     length: urls.length,
+    userId,
+    folderName: folderName ? folderName : 'general',
+    text,
     tweets: urls.map(url => {
       return {
         url: url.expanded_url,
@@ -35,12 +41,10 @@ function getBookmarkObject(message) {
   };
 }
 
-function getCommand(message) {
-  const text = message.message_create.message_data.text;
-  console.log(text);
-  const commands = ['/addFolder', '/tambahFolder'];
+function getCommand(text) {
+  const commands = ['/createFolder', '/buatFolder', '/+folder'];
   return commands.filter(c => {
-    const re = new RegExp(`^${c} `);
+    const re = new RegExp(`^${c.replace(/([+?])/g, '\\$1')} `);
     return text.match(re);
   })[0];
 }
