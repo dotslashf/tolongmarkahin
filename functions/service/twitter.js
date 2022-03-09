@@ -69,7 +69,7 @@ class Twitter {
         msg = `🔮 List command:\n\n${formatCommandsHelp()}`;
         break;
       case 'error':
-        msg = `💀 ada yang salah`;
+        msg = `💀 terjadi kesalahan`;
         break;
     }
 

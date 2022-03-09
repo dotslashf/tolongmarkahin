@@ -31,6 +31,12 @@ async function onEvent(firestore, body) {
     // buat folder baru
     if (['/createFolder', '/buatFolder'].includes(command)) {
       const isFolderExist = await firestore.isFolderExist(userId, folderName);
+      if (folderName === 'general') {
+        return twitter.sendMessage({
+          userId,
+          type: 'error',
+        });
+      }
       if (isFolderExist) {
         return twitter.sendDirectMessage({
           userId,
