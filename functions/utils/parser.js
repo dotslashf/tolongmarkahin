@@ -74,10 +74,12 @@ async function onEvent(firestore, body) {
         });
       }
 
-      tweets.forEach(async tweet => {
-        const t = await twitter.checkTweetBookmark(tweet.tweetId);
-        await firestore.addBookmark(folderName, t);
-      });
+      await Promise.all(
+        tweets.map(async tweet => {
+          const t = await twitter.checkTweetBookmark(tweet.tweetId);
+          await firestore.addBookmark(folderName, t);
+        })
+      );
       await twitter.sendDirectMessage({
         type: 'tambahBookmark',
         length,
@@ -121,13 +123,17 @@ async function onEvent(firestore, body) {
     }
 
     // add bookmark ke folder default
-    tweets.forEach(async tweet => {
-      const t = await twitter.checkTweetBookmark(tweet.tweetId);
-      await firestore.addBookmark(folderName, t);
-      await twitter.sendDirectMessage(
-        `${length} bookmark telah ditambahkan ke ${folderName}`
-      );
-      return;
+    await Promise.all(
+      tweets.map(async tweet => {
+        const t = await twitter.checkTweetBookmark(tweet.tweetId);
+        await firestore.addBookmark(folderName, t);
+        return;
+      })
+    );
+    await twitter.sendDirectMessage({
+      type: 'tambahBookmark',
+      folderName,
+      length,
     });
   } catch (e) {
     logger.error('onEvent', e);
