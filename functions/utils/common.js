@@ -55,7 +55,6 @@ function getSetConfigCommand(text) {
   try {
     const command = text.split(' ')[1];
     const value = text.split(' ')[2];
-    console.log('c', command, 'v', value);
     return {
       command,
       value,

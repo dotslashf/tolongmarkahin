@@ -7,6 +7,7 @@ const {
 } = require('./common');
 const Twitter = require('../service/twitter');
 const Firestore = require('../service/firestore');
+const bcrypt = require('bcrypt');
 
 /**
  *
@@ -106,8 +107,10 @@ async function onEvent(firestore, body) {
           text: 'format salah',
         });
       }
-      const { command, value } = getSetConfigCommand(text);
-      console.log(command, value);
+      let { command, value } = getSetConfigCommand(text);
+      if (command === 'password') {
+        value = await bcrypt.hash(value, 10);
+      }
       const update = { [command]: value };
       await firestore.setConfig(update);
       const updatedConfig = await firestore.getConfig();
