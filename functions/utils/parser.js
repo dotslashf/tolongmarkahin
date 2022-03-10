@@ -123,18 +123,20 @@ async function onEvent(firestore, body) {
     }
 
     // add bookmark ke folder default
-    await Promise.all(
-      tweets.map(async tweet => {
-        const t = await twitter.checkTweetBookmark(tweet.tweetId);
-        await firestore.addBookmark(folderName, t);
-        return;
-      })
-    );
-    await twitter.sendDirectMessage({
-      type: 'tambahBookmark',
-      folderName,
-      length,
-    });
+    if (!command && length > 0) {
+      await Promise.all(
+        tweets.map(async tweet => {
+          const t = await twitter.checkTweetBookmark(tweet.tweetId);
+          await firestore.addBookmark(folderName, t);
+          return;
+        })
+      );
+      await twitter.sendDirectMessage({
+        type: 'tambahBookmark',
+        folderName,
+        length,
+      });
+    }
   } catch (e) {
     logger.error('onEvent', e);
     await twitter.sendDirectMessage({ type: 'error' });
