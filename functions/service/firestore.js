@@ -15,6 +15,11 @@ class Firestore {
     this.db = admin.firestore();
   }
 
+  async isFirstTime() {
+    const snapshot = await this.db.collection('config').doc(this.userId).get();
+    return !snapshot.exists;
+  }
+
   async setUserId(userId) {
     this.userId = userId;
   }
@@ -65,18 +70,29 @@ class Firestore {
     return snapshot.data();
   }
 
-  async createConfig(userId) {
+  async createConfig() {
     const generatedPassword = Array(6)
       .fill('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
       .map(x => {
         return x[Math.floor(Math.random() * x.length)];
       })
       .join('');
-    await this.db.collection('config').doc(userId).set({
+    await this.db.collection('config').doc(this.userId).set({
       createdAt: new Date(),
       defaultFolder: 'general',
       password: generatedPassword,
     });
+  }
+
+  async setConfig({ defaultFolder, password }) {
+    const config = await this.getConfig();
+    await this.db
+      .collection('config')
+      .doc(this.userId)
+      .update({
+        defaultFolder: defaultFolder ? defaultFolder : config.defaultFolder,
+        password: password ? password : config.password,
+      });
   }
 
   async getData() {

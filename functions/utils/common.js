@@ -31,7 +31,7 @@ function getBookmarkObject(message) {
   return {
     length: urls.length,
     userId,
-    folderName: folderName ? folderName : 'general',
+    folderName: folderName ? folderName : null,
     text,
     tweets: urls.map(url => {
       return {
@@ -51,6 +51,20 @@ function getCommand(text) {
   return resultCommand ? resultCommand.command : null;
 }
 
+function getSetConfigCommand(text) {
+  try {
+    const command = text.split(' ')[1];
+    const value = text.split(' ')[2];
+    console.log('c', command, 'v', value);
+    return {
+      command,
+      value,
+    };
+  } catch {
+    throw new Error('Set config command error');
+  }
+}
+
 function formatCommandsHelp() {
   return commands
     .map(
@@ -62,9 +76,25 @@ function formatCommandsHelp() {
     .join('\n\n');
 }
 
+function formatJson(json) {
+  let result = [];
+  for (let key in json) {
+    result.push(
+      `🏷️ [${key}] = ${
+        typeof json[key] === 'object'
+          ? new Date(json[key]._seconds * 1000)
+          : json[key]
+      }`
+    );
+  }
+  return result.sort().join('\n\n');
+}
+
 module.exports = {
   validateSignature,
   getBookmarkObject,
   getCommand,
   formatCommandsHelp,
+  formatJson,
+  getSetConfigCommand,
 };

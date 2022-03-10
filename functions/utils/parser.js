@@ -1,5 +1,10 @@
 const { logger } = require('firebase-functions');
-const { getBookmarkObject, getCommand } = require('./common');
+const {
+  getBookmarkObject,
+  getCommand,
+  getSetConfigCommand,
+  formatJson,
+} = require('./common');
 const Twitter = require('../service/twitter');
 const Firestore = require('../service/firestore');
 
@@ -18,11 +23,16 @@ async function onEvent(firestore, body) {
   const twitter = new Twitter();
   const message = twitter.getLastMessage(direct_message_events);
 
-  const { length, tweets, userId, folderName, text } =
-    getBookmarkObject(message);
+  let { length, tweets, userId, folderName, text } = getBookmarkObject(message);
 
   try {
     firestore.setUserId(userId);
+    const isFirstTime = await firestore.isFirstTime();
+    if (isFirstTime) {
+      await firestore.createConfig();
+    }
+    const config = await firestore.getConfig();
+    folderName = folderName || config.defaultFolder;
     const command = getCommand(text);
 
     // reject non command
@@ -79,6 +89,32 @@ async function onEvent(firestore, body) {
     if (['/help'].includes(command)) {
       await twitter.sendDirectMessage({ type: 'help' });
       return;
+    }
+
+    if (['/getConfig'].includes(command)) {
+      await twitter.sendDirectMessage({
+        type: 'config',
+        text: formatJson(config),
+      });
+    }
+
+    if (['/setConfig'].includes(command)) {
+      const isCorrectFormat = text.split(' ').length === 3;
+      if (!isCorrectFormat) {
+        return twitter.sendDirectMessage({
+          type: 'error',
+          text: 'format salah',
+        });
+      }
+      const { command, value } = getSetConfigCommand(text);
+      console.log(command, value);
+      const update = { [command]: value };
+      await firestore.setConfig(update);
+      const updatedConfig = await firestore.getConfig();
+      await twitter.sendDirectMessage({
+        type: 'config',
+        text: formatJson(updatedConfig),
+      });
     }
 
     // add bookmark ke folder default

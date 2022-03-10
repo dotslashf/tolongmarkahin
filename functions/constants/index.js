@@ -33,5 +33,15 @@ module.exports = {
       help: '',
       description: 'Menampilkan pesan ini',
     },
+    {
+      command: '/getConfig',
+      help: '',
+      description: 'Menampilkan config',
+    },
+    {
+      command: '/setConfig',
+      help: '/setConfig defaultFolder [namafolder] | password [passwordBaru]',
+      description: 'Mengubah config default folder atau password',
+    },
   ],
 };
