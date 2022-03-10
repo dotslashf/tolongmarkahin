@@ -1,5 +1,4 @@
 const Twit = require('twit');
-const { logger } = require('firebase-functions');
 const { formatCommandsHelp } = require('../utils/common');
 require('dotenv').config();
 
@@ -56,7 +55,7 @@ class Twitter {
     });
   }
 
-  sendDirectMessage({ type, folderName, length }) {
+  sendDirectMessage({ type, folderName, length, text }) {
     let msg = '';
     switch (type) {
       case 'tambahFolder':
@@ -71,8 +70,11 @@ class Twitter {
       case 'help':
         msg = `🔮 List command:\n\n${formatCommandsHelp()}`;
         break;
+      case 'config':
+        msg = `⚙️ Config: \n\n${text}`;
+        break;
       case 'error':
-        msg = `💀 terjadi kesalahan`;
+        msg = text ? `💀 terjadi kesalahan: ${text}` : '💀 terjadi kesalahan';
         break;
     }
 
