@@ -23,15 +23,28 @@ function validateSignature(header, body) {
   );
 }
 
+function isValidUrl(url) {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function getBookmarkObject(message) {
   const urls = message.message_create.message_data.entities.urls;
-  const userId = message.message_create.sender_id;
-  const folderName = message.message_create.message_data.text.split(' ')[1];
+  let userId = message.message_create.sender_id;
+  userId === '1012117785512558592'
+    ? (userId = message.message_create.target.recipient_id)
+    : userId;
   const text = message.message_create.message_data.text;
+  const isUrl = isValidUrl(text.split(' ')[1]);
+  const folderName = text.split(' ')[1];
   return {
     length: urls.length,
     userId,
-    folderName: folderName ? folderName : null,
+    folderName: isUrl ? null : folderName,
     text,
     tweets: urls.map(url => {
       return {
