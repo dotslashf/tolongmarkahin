@@ -36,7 +36,6 @@ class Firestore {
             text: 'dummy text',
           },
         });
-      logger.info(`success createFolder: ${userId} ${folderName}`);
     } catch (e) {
       logger.error(e);
     }
@@ -52,9 +51,6 @@ class Firestore {
   }
 
   async addBookmark(folderName, bookmark) {
-    if (!folderName) {
-      folderName = 'general';
-    }
     await this.db
       .collection('bookmarks')
       .doc(this.userId)
@@ -63,6 +59,7 @@ class Firestore {
         createdAt: new Date(),
         tweet: bookmark,
       });
+    console.log('addBookmark', this.userId);
   }
 
   async getConfig() {
