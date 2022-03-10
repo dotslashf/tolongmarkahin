@@ -5,8 +5,8 @@ const {
   getSetConfigCommand,
   formatJson,
 } = require('./common');
-const Twitter = require('../service/twitter');
-const Firestore = require('../service/firestore');
+const Twitter = require('../services/twitter');
+const Firestore = require('../services/firestore');
 const bcrypt = require('bcrypt');
 
 /**

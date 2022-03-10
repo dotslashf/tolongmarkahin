@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const crypto = require('crypto');
 const { onEvent } = require('./utils/parser');
 const { validateSignature } = require('./utils/common');
-const Firestore = require('./service/firestore');
+const Firestore = require('./services/firestore');
 require('dotenv').config();
 
 const firestore = new Firestore();
