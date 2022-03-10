@@ -11,6 +11,7 @@ class Twitter {
       access_token: process.env.TWITTER_ACCESS_TOKEN,
       access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
     });
+    this.userId = null;
   }
 
   getLastMessage(direct_message_events) {
@@ -29,6 +30,8 @@ class Twitter {
     ) {
       return reject(new Error('Dont reply to yourself'));
     }
+
+    this.userId = message.message_create.sender_id;
 
     return message;
   }
@@ -53,7 +56,7 @@ class Twitter {
     });
   }
 
-  sendDirectMessage({ userId, type, folderName, length }) {
+  sendDirectMessage({ type, folderName, length }) {
     let msg = '';
     switch (type) {
       case 'tambahFolder':
@@ -81,7 +84,7 @@ class Twitter {
             type: 'message_create',
             message_create: {
               target: {
-                recipient_id: userId,
+                recipient_id: this.userId,
               },
               message_data: {
                 text: msg,

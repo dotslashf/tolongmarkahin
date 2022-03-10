@@ -5,6 +5,7 @@ const serviceAccount = require('../../serviceAccountKey.json');
 class Firestore {
   constructor() {
     this.db = null;
+    this.userId = null;
   }
 
   init() {
@@ -14,11 +15,15 @@ class Firestore {
     this.db = admin.firestore();
   }
 
-  async createFolder(userId, folderName) {
+  async setUserId(userId) {
+    this.userId = userId;
+  }
+
+  async createFolder(folderName) {
     try {
       await this.db
         .collection('bookmarks')
-        .doc(userId)
+        .doc(this.userId)
         .collection(folderName)
         .add({
           createdAt: new Date(),
@@ -32,27 +37,46 @@ class Firestore {
     }
   }
 
-  async isFolderExist(userId, folderName) {
+  async isFolderExist(folderName) {
     const docRef = await this.db
       .collection('bookmarks')
-      .doc(userId)
+      .doc(this.userId)
       .collection(folderName)
       .get();
     return !docRef.empty;
   }
 
-  async addBookmark(userId, folderName, bookmark) {
+  async addBookmark(folderName, bookmark) {
     if (!folderName) {
       folderName = 'general';
     }
     await this.db
       .collection('bookmarks')
-      .doc(userId)
+      .doc(this.userId)
       .collection(folderName)
       .add({
         createdAt: new Date(),
         tweet: bookmark,
       });
+  }
+
+  async getConfig() {
+    const snapshot = await this.db.collection('config').doc(this.userId).get();
+    return snapshot.data();
+  }
+
+  async createConfig(userId) {
+    const generatedPassword = Array(6)
+      .fill('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
+      .map(x => {
+        return x[Math.floor(Math.random() * x.length)];
+      })
+      .join('');
+    await this.db.collection('config').doc(userId).set({
+      createdAt: new Date(),
+      defaultFolder: 'general',
+      password: generatedPassword,
+    });
   }
 
   async getData() {
