@@ -1,6 +1,6 @@
 const admin = require('firebase-admin');
 const { logger } = require('firebase-functions/v1');
-const serviceAccount = require('../../serviceAccountKey.json');
+const serviceAccount = require('../serviceAccountKey.json');
 const bcryptjs = require('bcryptjs');
 
 class Firestore {

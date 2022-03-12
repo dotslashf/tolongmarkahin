@@ -7,7 +7,6 @@ const {
 } = require('./common');
 const Twitter = require('../services/twitter');
 const Firestore = require('../services/firestore');
-const bcrypt = require('bcrypt');
 
 /**
  *
