@@ -35,7 +35,7 @@ function isValidUrl(url) {
 function getBookmarkObject(message) {
   const urls = message.message_create.message_data.entities.urls;
   let userId = message.message_create.sender_id;
-  userId === '1012117785512558592'
+  userId === '1412415440559689735'
     ? (userId = message.message_create.target.recipient_id)
     : userId;
   const text = message.message_create.message_data.text;
