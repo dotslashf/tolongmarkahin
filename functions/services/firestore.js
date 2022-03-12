@@ -1,6 +1,7 @@
 const admin = require('firebase-admin');
 const { logger } = require('firebase-functions/v1');
 const serviceAccount = require('../../serviceAccountKey.json');
+const bcryptjs = require('bcryptjs');
 
 class Firestore {
   constructor() {
@@ -59,30 +60,49 @@ class Firestore {
         createdAt: new Date(),
         tweet: bookmark,
       });
-    console.log('addBookmark', this.userId);
   }
 
   async getConfig() {
     const snapshot = await this.db.collection('config').doc(this.userId).get();
-    return snapshot.data();
+    return {
+      ...snapshot.data(),
+      createdAt: snapshot.data().createdAt.toDate(),
+    };
   }
 
-  async createConfig() {
+  async createConfig(username, folderName) {
     const generatedPassword = Array(6)
       .fill('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
       .map(x => {
         return x[Math.floor(Math.random() * x.length)];
       })
       .join('');
-    await this.db.collection('config').doc(this.userId).set({
+    const hashedPassword = bcryptjs.hashSync(generatedPassword);
+    await this.db
+      .collection('config')
+      .doc(this.userId)
+      .set({
+        createdAt: new Date(),
+        defaultFolder: folderName ? folderName : 'general',
+        password: hashedPassword,
+        username,
+      });
+
+    return {
       createdAt: new Date(),
       defaultFolder: 'general',
       password: generatedPassword,
-    });
+      username,
+    };
   }
 
   async setConfig({ defaultFolder, password }) {
     const config = await this.getConfig();
+    console.log('password', password);
+    if (password) {
+      const hashedPassword = bcryptjs.hashSync(password);
+      password = hashedPassword;
+    }
     await this.db
       .collection('config')
       .doc(this.userId)

@@ -91,13 +91,7 @@ function formatCommandsHelp() {
 function formatJson(json) {
   let result = [];
   for (let key in json) {
-    result.push(
-      `🏷️ [${key}] = ${
-        typeof json[key] === 'object'
-          ? new Date(json[key]._seconds * 1000)
-          : json[key]
-      }`
-    );
+    result.push(`🏷️ [${key}] = ${json[key]}`);
   }
   return result.sort().join('\n\n');
 }
