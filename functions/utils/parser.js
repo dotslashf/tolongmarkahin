@@ -15,12 +15,23 @@ const Firestore = require('../services/firestore');
  * @returns
  */
 async function onEvent(firestore, body) {
-  const { direct_message_events } = body;
-  if (!direct_message_events || direct_message_events.length === 0) {
+  const { direct_message_events, follow_events } = body;
+  if (!follow_events && !direct_message_events) {
+    return;
+  }
+  const twitter = new Twitter();
+
+  if (follow_events && follow_events[0].type === 'unfollow') {
     return;
   }
 
-  const twitter = new Twitter();
+  if (follow_events && follow_events[0].type === 'follow') {
+    const userId = follow_events[0].source.id;
+    twitter.setRecipientId(userId);
+    await twitter.sendDirectMessage({ type: 'follow' });
+    return;
+  }
+
   const message = twitter.getLastMessage(direct_message_events);
 
   let { length, tweets, userId, folderName, text } = getBookmarkObject(message);

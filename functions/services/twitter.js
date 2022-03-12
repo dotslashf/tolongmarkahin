@@ -13,6 +13,10 @@ class Twitter {
     this.userId = null;
   }
 
+  setRecipientId(userId) {
+    this.userId = userId;
+  }
+
   getLastMessage(direct_message_events) {
     const message = direct_message_events.shift();
 
@@ -30,7 +34,7 @@ class Twitter {
       return reject(new Error('Dont reply to yourself'));
     }
 
-    this.userId = message.message_create.sender_id;
+    this.setRecipientId(message.message_create.sender_id);
 
     return message;
   }
@@ -78,6 +82,10 @@ class Twitter {
         break;
       case 'firstTime':
         msg = `🤖 Hi, ${text}!\n\nTerimakasih telah mencoba tolongmarkahin.\n\nSilahkan login menggunakan username dan password pada konfigurasi awal.\n\nBerikut adalah konfigurasi awal:`;
+        break;
+      case 'follow':
+        msg = `🤖 Terimakasih telah mengikuti tolongmarkahin.`;
+        break;
     }
 
     return new Promise((resolve, reject) => {
