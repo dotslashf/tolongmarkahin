@@ -76,6 +76,8 @@ class Twitter {
       case 'error':
         msg = text ? `💀 terjadi kesalahan: ${text}` : '💀 terjadi kesalahan';
         break;
+      case 'firstTime':
+        msg = `🤖 Hi, ${text}!\n\nTerimakasih telah mencoba tolongmarkahin.\n\nSilahkan login menggunakan username dan password pada konfigurasi awal.\n\nBerikut adalah konfigurasi awal:`;
     }
 
     return new Promise((resolve, reject) => {
@@ -93,6 +95,24 @@ class Twitter {
               },
             },
           },
+        },
+        (err, data) => {
+          if (err) {
+            console.error(err);
+            return reject(err);
+          }
+          return resolve(data);
+        }
+      );
+    });
+  }
+
+  getUserProfile(userId) {
+    return new Promise((resolve, reject) => {
+      this.client.get(
+        'users/show',
+        {
+          user_id: userId,
         },
         (err, data) => {
           if (err) {

@@ -30,7 +30,19 @@ async function onEvent(firestore, body) {
     firestore.setUserId(userId);
     const isFirstTime = await firestore.isFirstTime();
     if (isFirstTime) {
-      await firestore.createConfig();
+      const user = await twitter.getUserProfile(userId);
+      const defaultConfig = await firestore.createConfig(
+        user.screen_name,
+        folderName
+      );
+      await twitter.sendDirectMessage({
+        type: 'firstTime',
+        text: user.screen_name,
+      });
+      await twitter.sendDirectMessage({
+        type: 'config',
+        text: formatJson(defaultConfig),
+      });
     }
     const config = await firestore.getConfig();
     folderName = folderName || config.defaultFolder;
@@ -110,9 +122,6 @@ async function onEvent(firestore, body) {
         });
       }
       let { command, value } = getSetConfigCommand(text);
-      if (command === 'password') {
-        value = await bcrypt.hash(value, 10);
-      }
       const update = { [command]: value };
       await firestore.setConfig(update);
       const updatedConfig = await firestore.getConfig();
