@@ -116,6 +116,14 @@ async function onEvent(firestore, body) {
       return;
     }
 
+    if (['/listFolder'].includes(command)) {
+      const folders = await firestore.getFolders();
+      await twitter.sendDirectMessage({
+        type: 'listFolder',
+        text: folders.join('\n'),
+      });
+    }
+
     if (['/getConfig'].includes(command)) {
       await twitter.sendDirectMessage({
         type: 'config',

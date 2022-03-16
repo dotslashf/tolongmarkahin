@@ -86,6 +86,9 @@ class Twitter {
       case 'follow':
         msg = `🤖 Terimakasih telah mengikuti tolongmarkahin.`;
         break;
+      case 'listFolder':
+        msg = `📂 List folder: \n\n${text}`;
+        break;
     }
 
     return new Promise((resolve, reject) => {

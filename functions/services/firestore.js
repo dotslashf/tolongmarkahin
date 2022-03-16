@@ -62,6 +62,14 @@ class Firestore {
       });
   }
 
+  async getFolders() {
+    const snapshot = await this.db
+      .collection('bookmarks')
+      .doc(this.userId)
+      .listCollections();
+    return snapshot.map(doc => doc.id);
+  }
+
   async getConfig() {
     const snapshot = await this.db.collection('config').doc(this.userId).get();
     return {
