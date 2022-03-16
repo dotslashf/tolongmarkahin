@@ -13,14 +13,15 @@ module.exports = {
         '/af',
       ],
       help: '/buatFolder [namafolder]',
-      description: 'Membuat folder, nama folder tidak boleh menggunakan spasi',
+      description:
+        'Membuat folder, nama folder tidak boleh menggunakan spasi, tanpa karakter [ dan ]',
     },
     {
       command: '/ke',
       help: '/ke [namafolder] [link tweet]',
       alias: ['/to'],
       description:
-        'Menyimpan bookmark pada folder spesifik, link tweet bookmark dapat lebih dari satu',
+        'Menyimpan bookmark pada folder spesifik, link tweet bookmark dapat lebih dari satu, tanpa karakter [ dan ]',
     },
     {
       command: '/listFolder',
@@ -43,7 +44,8 @@ module.exports = {
       command: '/setConfig',
       alias: ['/sc'],
       help: '/setConfig defaultFolder [namafolder] | password [passwordBaru]',
-      description: 'Mengubah config default folder atau password',
+      description:
+        'Mengubah config default folder atau password, tanpa karakter [ dan ]',
     },
   ],
 };
