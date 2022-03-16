@@ -86,21 +86,18 @@ class Firestore {
       })
       .join('');
     const hashedPassword = bcryptjs.hashSync(generatedPassword);
-    await this.db
-      .collection('config')
-      .doc(this.userId)
-      .set({
-        createdAt: new Date(),
-        defaultFolder: folderName ? folderName : 'general',
-        password: hashedPassword,
-        username,
-      });
+
+    const configObj = {
+      createdAt: new Date(),
+      defaultFolder: folderName ? folderName : 'general',
+      password: hashedPassword,
+      username: username.toLowerCase(),
+    };
+    await this.db.collection('config').doc(this.userId).set(configObj);
 
     return {
-      createdAt: new Date(),
-      defaultFolder: 'general',
+      ...configObj,
       password: generatedPassword,
-      username,
     };
   }
 
