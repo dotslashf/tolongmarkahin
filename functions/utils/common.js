@@ -61,7 +61,7 @@ function getCommand(text) {
     const re = new RegExp(`(^${c.command}$)`, 'm');
     return command.match(re);
   })[0];
-  return resultCommand ? resultCommand.command : null;
+  return resultCommand ? resultCommand.command.toLowerCase() : null;
 }
 
 function getSetConfigCommand(text) {

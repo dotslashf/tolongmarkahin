@@ -21,16 +21,16 @@ async function onEvent(firestore, body) {
   }
   const twitter = new Twitter();
 
-  if (follow_events && follow_events[0].type === 'unfollow') {
-    return;
-  }
+  // if (follow_events && follow_events[0].type === 'unfollow') {
+  //   return;
+  // }
 
-  if (follow_events && follow_events[0].type === 'follow') {
-    const userId = follow_events[0].source.id;
-    twitter.setRecipientId(userId);
-    await twitter.sendDirectMessage({ type: 'follow' });
-    return;
-  }
+  // if (follow_events && follow_events[0].type === 'follow') {
+  //   const userId = follow_events[0].source.id;
+  //   twitter.setRecipientId(userId);
+  //   await twitter.sendDirectMessage({ type: 'follow' });
+  //   return;
+  // }
 
   const message = twitter.getLastMessage(direct_message_events);
 
@@ -64,7 +64,7 @@ async function onEvent(firestore, body) {
     }
 
     // buat folder baru
-    if (['/createFolder', '/buatFolder'].includes(command)) {
+    if (['/createfolder', '/buatfolder'].includes(command)) {
       const isFolderExist = await firestore.isFolderExist(folderName);
       if (folderName === 'general') {
         return twitter.sendMessage({
@@ -116,7 +116,7 @@ async function onEvent(firestore, body) {
       return;
     }
 
-    if (['/listFolder'].includes(command)) {
+    if (['/listfolder'].includes(command)) {
       const folders = await firestore.getFolders();
       await twitter.sendDirectMessage({
         type: 'listFolder',
@@ -124,14 +124,14 @@ async function onEvent(firestore, body) {
       });
     }
 
-    if (['/getConfig'].includes(command)) {
+    if (['/getconfig'].includes(command)) {
       await twitter.sendDirectMessage({
         type: 'config',
         text: formatJson(config),
       });
     }
 
-    if (['/setConfig'].includes(command)) {
+    if (['/setconfig'].includes(command)) {
       const isCorrectFormat = text.split(' ').length === 3;
       if (!isCorrectFormat) {
         return twitter.sendDirectMessage({
