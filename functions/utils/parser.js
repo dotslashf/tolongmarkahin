@@ -194,7 +194,7 @@ async function onEvent(firestore, body) {
     }
   } catch (e) {
     logger.error('onEvent', e);
-    await twitter.sendDirectMessage({ type: 'error' });
+    await twitter.sendDirectMessage({ type: 'error', text: e });
   }
 }
 
