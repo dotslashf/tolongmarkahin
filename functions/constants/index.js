@@ -1,30 +1,30 @@
 module.exports = {
   commands: [
     {
-      command: '/createFolder',
-      help: '/createFolder [namafolder]',
-      description: 'Membuat folder, nama folder tidak boleh menggunakan spasi',
-    },
-    {
       command: '/buatFolder',
-
+      alias: [
+        '/createFolder',
+        '/cf',
+        '/newFolder',
+        '/nf',
+        '/tambahFolder',
+        '/tf',
+        '/addFolder',
+        '/af',
+      ],
       help: '/buatFolder [namafolder]',
-      description: 'Sama dengan /createFolder',
+      description: 'Membuat folder, nama folder tidak boleh menggunakan spasi',
     },
     {
       command: '/ke',
       help: '/ke [namafolder] [link tweet]',
+      alias: ['/to'],
       description:
         'Menyimpan bookmark pada folder spesifik, link tweet bookmark dapat lebih dari satu',
     },
     {
-      command: '/to',
-      help: '/to [namafolder] [link tweet]',
-      description: 'Sama dengan /ke',
-    },
-    {
       command: '/listFolder',
-
+      alias: ['/listFolders', '/lf'],
       help: '',
       description: 'Memunculkan list folder bookmark',
     },
@@ -35,11 +35,13 @@ module.exports = {
     },
     {
       command: '/getConfig',
+      alias: ['/config', '/gf'],
       help: '',
       description: 'Menampilkan config',
     },
     {
       command: '/setConfig',
+      alias: ['/sc'],
       help: '/setConfig defaultFolder [namafolder] | password [passwordBaru]',
       description: 'Mengubah config default folder atau password',
     },

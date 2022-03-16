@@ -4,6 +4,7 @@ const {
   getCommand,
   getSetConfigCommand,
   formatJson,
+  createCommandHash,
 } = require('./common');
 const Twitter = require('../services/twitter');
 const Firestore = require('../services/firestore');
@@ -63,8 +64,15 @@ async function onEvent(firestore, body) {
       return;
     }
 
+    const commandHash = createCommandHash();
+
     // buat folder baru
-    if (['/createfolder', '/buatfolder'].includes(command)) {
+    if (
+      commandHash['/buatFolder']
+        .concat('/buatFolder')
+        .map(c => c.toLowerCase())
+        .includes(command)
+    ) {
       const isFolderExist = await firestore.isFolderExist(folderName);
       if (folderName === 'general') {
         return twitter.sendMessage({
@@ -86,7 +94,12 @@ async function onEvent(firestore, body) {
     }
 
     // add bookmark ke folder
-    if (['/ke', '/to'].includes(command)) {
+    if (
+      commandHash['/ke']
+        .concat('/ke')
+        .map(c => c.toLowerCase())
+        .includes(command)
+    ) {
       const isFolderExist = await firestore.isFolderExist(folderName);
       if (!isFolderExist) {
         await firestore.createFolder(folderName);
@@ -116,7 +129,12 @@ async function onEvent(firestore, body) {
       return;
     }
 
-    if (['/listfolder'].includes(command)) {
+    if (
+      commandHash['/listFolder']
+        .concat('/listFolder')
+        .map(c => c.toLowerCase())
+        .includes(command)
+    ) {
       const folders = await firestore.getFolders();
       await twitter.sendDirectMessage({
         type: 'listFolder',
@@ -124,14 +142,24 @@ async function onEvent(firestore, body) {
       });
     }
 
-    if (['/getconfig'].includes(command)) {
+    if (
+      commandHash['/getConfig']
+        .concat('/getConfig')
+        .map(c => c.toLowerCase())
+        .includes(command)
+    ) {
       await twitter.sendDirectMessage({
         type: 'config',
         text: formatJson(config),
       });
     }
 
-    if (['/setconfig'].includes(command)) {
+    if (
+      commandHash['/setConfig']
+        .concat('/setConfig')
+        .map(c => c.toLowerCase())
+        .includes(command)
+    ) {
       const isCorrectFormat = text.split(' ').length === 3;
       if (!isCorrectFormat) {
         return twitter.sendDirectMessage({

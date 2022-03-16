@@ -57,11 +57,18 @@ function getBookmarkObject(message) {
 
 function getCommand(text) {
   const command = text.split(' ')[0];
-  const resultCommand = commands.filter(c => {
-    const re = new RegExp(`(^${c.command}$)`, 'm');
+  const allCommands = commands
+    .map(c => {
+      return [c.command, c.alias ? c.alias : null];
+    })
+    .flat()
+    .flat()
+    .filter(obj => obj);
+  const resultCommand = allCommands.filter(c => {
+    const re = new RegExp(`(^${c}$)`, 'm');
     return command.match(re);
   })[0];
-  return resultCommand ? resultCommand.command.toLowerCase() : null;
+  return resultCommand ? resultCommand.toLowerCase() : null;
 }
 
 function getSetConfigCommand(text) {
@@ -98,6 +105,18 @@ function formatJson(json) {
   return result.sort().join('\n\n');
 }
 
+function createCommandHash() {
+  const commandHash = {};
+
+  commands.map(command => {
+    if (command.alias) {
+      commandHash[command.command] = command.alias;
+    }
+  });
+
+  return commandHash;
+}
+
 module.exports = {
   validateSignature,
   getBookmarkObject,
@@ -105,4 +124,5 @@ module.exports = {
   formatCommandsHelp,
   formatJson,
   getSetConfigCommand,
+  createCommandHash,
 };
