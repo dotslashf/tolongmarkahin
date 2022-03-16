@@ -88,9 +88,9 @@ function formatCommandsHelp() {
   return commands
     .map(
       c =>
-        `💡 ${c.command}${c.help !== '' ? `\n❓ ${c.help}` : ''}\nℹ️ ${
-          c.description
-        }`
+        `💡 ${c.command}${c.alias ? `\nalias: ${c.alias.join(', ')}` : ''}${
+          c.help !== '' ? `\n❓ ${c.help}` : ''
+        }\nℹ️ ${c.description}`
     )
     .join('\n\n');
 }
