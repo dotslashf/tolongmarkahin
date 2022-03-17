@@ -1,4 +1,6 @@
-# Tolongmarkahin
+# 📖 Tolongmarkahin
+
+[![Twitter Follow](https://img.shields.io/twitter/follow/tolongmarkahin?color=%231DA1F2&style=flat-square)](https://twitter.com/tolongmarkahin)
 
 ## Deskripsi
 
@@ -21,4 +23,3 @@ TWITTER_ACCESS_TOKEN=""
 TWITTER_ACCESS_TOKEN_SECRET=""
 TWITTER_WEBHOOK_ENV=""
 ```
-
