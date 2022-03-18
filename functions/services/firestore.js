@@ -52,6 +52,7 @@ class Firestore {
   }
 
   async addBookmark(folderName, bookmark) {
+    bookmark.place ? delete bookmark.place : null;
     await this.db
       .collection('bookmarks')
       .doc(this.userId)
