@@ -47,7 +47,8 @@ function getBookmarkObject(message) {
     : userId;
   const text = message.message_create.message_data.text;
   const isUrl = isValidUrl(text.split(' ')[1]);
-  const folderName = fixCharFolderName(text.split(' ')[1]);
+  const folderName = text.split(' ')[1];
+
   return {
     length: urls.length,
     userId,
