@@ -54,5 +54,12 @@ module.exports = {
       description:
         'Mengubah nama folder, nama folder tidak boleh menggunakan spasi, tanpa karakter [ dan ]',
     },
+    {
+      command: '/deleteFolder',
+      alias: ['/delete', '/df'],
+      help: '/deleteFolder [namaFolder]',
+      description:
+        'Menghapus folder dan semua bookmark yang ada di dalamnya, nama folder tidak boleh menggunakan spasi, tanpa karakter [ dan ]',
+    },
   ],
 };

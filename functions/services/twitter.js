@@ -74,6 +74,9 @@ class Twitter {
       case 'renameFolder':
         msg = `✨ folder ${folderName} berhasil diubah menjadi ${text}`;
         break;
+      case 'deleteFolder':
+        msg = `✨ folder ${folderName} berhasil dihapus`;
+        break;
       case 'tambahBookmark':
         msg = `✨ ${length} bookmark telah ditambahkan ke ${folderName}`;
         break;

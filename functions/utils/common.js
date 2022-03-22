@@ -32,6 +32,13 @@ function isValidUrl(url) {
   }
 }
 
+function fixCharFolderName(text) {
+  return text
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+}
+
 function getBookmarkObject(message) {
   const urls = message.message_create.message_data.entities.urls;
   let userId = message.message_create.sender_id;
@@ -40,7 +47,7 @@ function getBookmarkObject(message) {
     : userId;
   const text = message.message_create.message_data.text;
   const isUrl = isValidUrl(text.split(' ')[1]);
-  const folderName = text.split(' ')[1];
+  const folderName = fixCharFolderName(text.split(' ')[1]);
   return {
     length: urls.length,
     userId,
@@ -86,11 +93,22 @@ function getSetConfigCommand(text) {
 
 function getRenameFolder(text) {
   try {
-    const oldName = text.split(' ')[1];
-    const newName = text.split(' ')[2];
+    const oldName = fixCharFolderName(text.split(' ')[1]);
+    const newName = fixCharFolderName(text.split(' ')[2]);
     return {
       oldName,
       newName,
+    };
+  } catch {
+    throw new Error('Set config command error');
+  }
+}
+
+function getDeleteFolder(text) {
+  try {
+    const folderName = fixCharFolderName(text.split(' ')[2]);
+    return {
+      folderName,
     };
   } catch {
     throw new Error('Set config command error');
@@ -173,4 +191,5 @@ module.exports = {
   formatListFolder,
   getRenameFolder,
   formatFolderName,
+  getDeleteFolder,
 };
