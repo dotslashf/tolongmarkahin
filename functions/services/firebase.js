@@ -10,9 +10,11 @@ class Firestore {
   }
 
   init() {
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
+    if (!admin.apps.length) {
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+    }
     this.db = admin.firestore();
   }
 
@@ -21,7 +23,7 @@ class Firestore {
     return !snapshot.exists;
   }
 
-  async setUserId(userId) {
+  setUserId(userId) {
     this.userId = userId;
   }
 
