@@ -8,6 +8,7 @@ const {
   formatListFolder,
   getRenameFolder,
   formatFolderName,
+  getDeleteFolder,
 } = require('./common');
 const Twitter = require('../services/twitter');
 const Firebase = require('../services/firebase');
@@ -307,7 +308,7 @@ async function onEvent(firebase, body) {
         .map(c => c.toLowerCase())
         .includes(command)
     ) {
-      const isCorrectFormat = text.split(' ').length === 3;
+      const isCorrectFormat = text.split(' ').length === 2;
       if (!isCorrectFormat) {
         await twitter.sendDirectMessage({
           type: 'error',

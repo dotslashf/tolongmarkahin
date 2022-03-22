@@ -106,7 +106,7 @@ function getRenameFolder(text) {
 
 function getDeleteFolder(text) {
   try {
-    const folderName = fixCharFolderName(text.split(' ')[2]);
+    const folderName = fixCharFolderName(text.split(' ')[1]);
     return {
       folderName,
     };
