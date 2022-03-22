@@ -6,6 +6,7 @@ const {
   formatJson,
   createCommandHash,
   formatListFolder,
+  getRenameFolder,
 } = require('./common');
 const Twitter = require('../services/twitter');
 const Firebase = require('../services/firebase');
@@ -76,18 +77,18 @@ async function onEvent(firebase, body) {
     ) {
       const isFolderExist = await firebase.isFolderExist(folderName);
       if (folderName === 'general') {
-        return twitter.sendMessage({
+        return await twitter.sendDirectMessage({
           type: 'error',
         });
       }
       if (isFolderExist) {
-        return twitter.sendDirectMessage({
+        return await twitter.sendDirectMessage({
           type: 'folderExist',
           folderName,
         });
       }
       if (folderName.includes('[') || folderName.includes(']')) {
-        return twitter.sendDirectMessage({
+        return await twitter.sendDirectMessage({
           type: 'error',
           text: 'nama folder tidak boleh mengandung karakter [ dan ]',
         });
@@ -170,17 +171,19 @@ async function onEvent(firebase, body) {
     ) {
       const isCorrectFormat = text.split(' ').length === 3;
       if (!isCorrectFormat) {
-        return twitter.sendDirectMessage({
+        await twitter.sendDirectMessage({
           type: 'error',
           text: 'format salah',
         });
+        return;
       }
       let { command, value } = getSetConfigCommand(text);
       if (value.includes('[') || value.includes(']')) {
-        return twitter.sendDirectMessage({
+        await twitter.sendDirectMessage({
           type: 'error',
           text: 'nama folder tidak boleh mengandung karakter [ dan ]',
         });
+        return;
       }
       const update = { [command]: value };
       await firebase.setConfig(update);
@@ -191,8 +194,74 @@ async function onEvent(firebase, body) {
       });
     }
 
-    // add bookmark ke folder default
+    if (
+      commandHash['/renameFolder']
+        .concat('/renameFolder')
+        .map(c => c.toLowerCase())
+        .includes(command)
+    ) {
+      const isCorrectFormat = text.split(' ').length === 3;
+      if (!isCorrectFormat) {
+        await twitter.sendDirectMessage({
+          type: 'error',
+          text: 'format salah',
+        });
+        return;
+      }
+      let { oldName, newName } = getRenameFolder(text);
+      if (oldName === newName) {
+        await twitter.sendDirectMessage({
+          type: 'error',
+          text: 'nama folder tidak boleh sama',
+        });
+        return;
+      }
+      if (
+        oldName.includes('[') ||
+        oldName.includes(']') ||
+        newName.includes('[') ||
+        newName.includes(']')
+      ) {
+        await twitter.sendDirectMessage({
+          type: 'error',
+          text: 'nama folder tidak boleh mengandung karakter [ dan ]',
+        });
+        return;
+      }
+      const isFolderExist = await firebase.isFolderExist(oldName);
+      if (!isFolderExist) {
+        await twitter.sendDirectMessage({
+          type: 'folderNotExist',
+          folderName: oldName,
+        });
+        return;
+      }
+      const isFolderNewExist = await firebase.isFolderExist(newName);
+      if (isFolderNewExist) {
+        await twitter.sendDirectMessage({
+          type: 'folderExist',
+          folderName: newName,
+        });
+        return;
+      }
+      const bookmarks = await firebase.getAllBookmarks(oldName);
+      await firebase.moveBookmark(newName, bookmarks);
+      await firebase.deleteCollection(oldName);
+      await twitter.sendDirectMessage({
+        type: 'renameFolder',
+        folderName: oldName,
+        text: newName,
+      });
+      const folders = await firebase.getFolders();
+      const foldersText = formatListFolder(folders, config.defaultFolder);
+      await twitter.sendDirectMessage({
+        type: 'listFolder',
+        text: foldersText,
+      });
+    }
+
     if (!command && length > 0) {
+      // add bookmark ke folder default
       await Promise.all(
         tweets.map(async tweet => {
           const t = await twitter.checkTweetBookmark(tweet.tweetId);

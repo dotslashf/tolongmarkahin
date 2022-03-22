@@ -68,6 +68,12 @@ class Twitter {
       case 'folderExist':
         msg = `🤔 folder ${folderName} sudah ada, gak mungkin double dong`;
         break;
+      case 'folderNotExist':
+        msg = `🤔 folder ${folderName} tidak ditemukan coba cek dengan command /listFolder`;
+        break;
+      case 'renameFolder':
+        msg = `✨ folder ${folderName} berhasil diubah menjadi ${text}`;
+        break;
       case 'tambahBookmark':
         msg = `✨ ${length} bookmark telah ditambahkan ke ${folderName}`;
         break;

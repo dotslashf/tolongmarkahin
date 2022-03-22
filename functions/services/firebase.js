@@ -120,6 +120,55 @@ class Firebase {
       });
   }
 
+  async getAllBookmarks(folderName) {
+    const bookmarksRef = await this.db
+      .collection('bookmarks')
+      .doc(this.userId)
+      .collection(folderName)
+      .where('tweet.full_text', '!=', 'dummy text')
+      .get();
+    return bookmarksRef.docs.map(doc => doc.data());
+  }
+
+  async moveBookmark(folderName, bookmarks) {
+    try {
+      await this.db
+        .collection('bookmarks')
+        .doc(this.userId)
+        .collection(folderName)
+        .add({
+          createdAt: new Date(),
+          tweet: {
+            text: 'dummy text',
+          },
+        });
+      await Promise.all(
+        bookmarks.map(async bookmark => {
+          await this.db
+            .collection('bookmarks')
+            .doc(this.userId)
+            .collection(folderName)
+            .add(bookmark);
+        })
+      );
+    } catch (e) {
+      logger.error(e);
+    }
+  }
+
+  async deleteCollection(folderName) {
+    await this.db
+      .collection('bookmarks')
+      .doc(this.userId)
+      .collection(folderName)
+      .get()
+      .then(snapshot => {
+        snapshot.forEach(doc => {
+          doc.ref.delete();
+        });
+      });
+  }
+
   async getData() {
     console.log('getData');
     const snapshot = await this.db.collection('bookmarks').get();

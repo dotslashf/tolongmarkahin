@@ -47,5 +47,12 @@ module.exports = {
       description:
         'Mengubah config default folder atau password, tanpa karakter [ dan ]\n cth:\nMengubah password:\n\n /setConfig password passwordBaru \nMengubah default folder:\n\n /setConfig defaultFolder namaFolder',
     },
+    {
+      command: '/renameFolder',
+      alias: ['/rename', '/rf'],
+      help: '/renameFolder [namaFolderLama] [namaFolderBaru]',
+      description:
+        'Mengubah nama folder, nama folder tidak boleh menggunakan spasi, tanpa karakter [ dan ]',
+    },
   ],
 };

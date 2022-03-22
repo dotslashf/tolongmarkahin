@@ -84,6 +84,19 @@ function getSetConfigCommand(text) {
   }
 }
 
+function getRenameFolder(text) {
+  try {
+    const oldName = text.split(' ')[1];
+    const newName = text.split(' ')[2];
+    return {
+      oldName,
+      newName,
+    };
+  } catch {
+    throw new Error('Set config command error');
+  }
+}
+
 function formatCommandsHelp() {
   return commands
     .map(
@@ -140,4 +153,5 @@ module.exports = {
   getSetConfigCommand,
   createCommandHash,
   formatListFolder,
+  getRenameFolder,
 };
