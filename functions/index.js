@@ -8,7 +8,7 @@ require('dotenv').config();
 const firebase = new Firebase();
 firebase.init();
 
-exports.webhook = functions.https.onRequest((req, res) => {
+exports.webhook = functions.https.onRequest(async (req, res) => {
   if (req.method === 'GET') {
     const crcToken = req.query.crc_token;
 
@@ -38,7 +38,7 @@ exports.webhook = functions.https.onRequest((req, res) => {
       console.error(e);
     }
 
-    onEvent(firebase, req.body);
+    await onEvent(firebase, req.body);
     return res.status(200).json({ status: 'Ok' });
   }
 });
