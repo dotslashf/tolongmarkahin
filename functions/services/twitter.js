@@ -87,7 +87,7 @@ class Twitter {
         msg = `🤖 Terimakasih telah mengikuti tolongmarkahin.`;
         break;
       case 'listFolder':
-        msg = `📂 List folder: \n\n${text}`;
+        msg = `📂 List folder: \n\n${text} \n\nfolder dengan emoji ✔️ adalah folder default`;
         break;
     }
 

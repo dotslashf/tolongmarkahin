@@ -117,6 +117,20 @@ function createCommandHash() {
   return commandHash;
 }
 
+function formatListFolder(folders, folderName) {
+  const index = folders.findIndex(folder => {
+    return folder === folderName;
+  });
+  folders.map((f, i) => {
+    if (i === index) {
+      folders[i] = `✨  ${f}`;
+    } else {
+      folders[i] = `〰️ ${f}`;
+    }
+  });
+  return folders.join('\n');
+}
+
 module.exports = {
   validateSignature,
   getBookmarkObject,
@@ -125,4 +139,5 @@ module.exports = {
   formatJson,
   getSetConfigCommand,
   createCommandHash,
+  formatListFolder,
 };

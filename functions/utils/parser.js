@@ -5,6 +5,7 @@ const {
   getSetConfigCommand,
   formatJson,
   createCommandHash,
+  formatListFolder,
 } = require('./common');
 const Twitter = require('../services/twitter');
 const Firestore = require('../services/firestore');
@@ -136,9 +137,10 @@ async function onEvent(firestore, body) {
         .includes(command)
     ) {
       const folders = await firestore.getFolders();
+      const foldersText = formatListFolder(folders, config.defaultFolder);
       await twitter.sendDirectMessage({
         type: 'listFolder',
-        text: folders.join('\n'),
+        text: foldersText,
       });
     }
 
