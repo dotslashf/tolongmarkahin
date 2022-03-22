@@ -78,9 +78,7 @@ class Twitter {
         msg = `⚙️ Config: \n\n${text}`;
         break;
       case 'error':
-        msg = text
-          ? `💀 terjadi kesalahan: \n${text}\n\n silahkan kirim pesan error ini ke @dotslashf / @mockdotexe`
-          : '💀 terjadi kesalahan';
+        msg = text ? `💀 terjadi kesalahan: \n${text}` : '💀 terjadi kesalahan';
         break;
       case 'firstTime':
         msg = `🤖 Hi, ${text}!\n\nTerimakasih telah mencoba tolongmarkahin.\n\nSilahkan login menggunakan username dan password pada konfigurasi awal.\n\nBerikut adalah konfigurasi awal:`;

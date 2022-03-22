@@ -208,7 +208,10 @@ async function onEvent(firebase, body) {
     }
   } catch (e) {
     logger.error('onEvent', e);
-    await twitter.sendDirectMessage({ type: 'error', text: e });
+    await twitter.sendDirectMessage({
+      type: 'error',
+      text: `${e}\n\n silahkan kirim pesan error ini ke @dotslashf / @mockdotexe`,
+    });
   }
 }
 
