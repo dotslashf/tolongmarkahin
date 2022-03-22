@@ -52,7 +52,7 @@ function getBookmarkObject(message) {
   return {
     length: urls.length,
     userId,
-    folderName: isUrl ? null : folderName,
+    folderName: isUrl ? null : fixCharFolderName(folderName),
     text,
     tweets: urls.map(url => {
       return {
@@ -168,7 +168,7 @@ function formatFolderName(folderName) {
     /(\w|\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g
   );
 
-  let _folderName = folderName;
+  let _folderName = fixCharFolderName(folderName);
   const result = _folderName.match(re);
   result.filter(r => {
     _folderName = _folderName.replace(r, '');

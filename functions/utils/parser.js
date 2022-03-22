@@ -204,6 +204,14 @@ async function onEvent(firebase, body) {
             )}\n\n karakter tersebut akan dihapus`,
           });
         }
+        const isFolderExist = await firebase.isFolderExist(formattedFolderName);
+        if (!isFolderExist) {
+          await firebase.createFolder(formattedFolderName);
+          await twitter.sendDirectMessage({
+            type: 'tambahFolder',
+            folderName: formattedFolderName,
+          });
+        }
         value = formattedFolderName;
       }
       const update = { [command]: value };
