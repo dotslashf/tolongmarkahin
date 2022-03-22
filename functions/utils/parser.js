@@ -86,6 +86,12 @@ async function onEvent(firebase, body) {
           folderName,
         });
       }
+      if (folderName.includes('[') || folderName.includes(']')) {
+        return twitter.sendDirectMessage({
+          type: 'error',
+          text: 'nama folder tidak boleh mengandung karakter [ dan ]',
+        });
+      }
       await firebase.createFolder(folderName);
       await twitter.sendDirectMessage({
         type: 'tambahFolder',
@@ -170,6 +176,12 @@ async function onEvent(firebase, body) {
         });
       }
       let { command, value } = getSetConfigCommand(text);
+      if (value.includes('[') || value.includes(']')) {
+        return twitter.sendDirectMessage({
+          type: 'error',
+          text: 'nama folder tidak boleh mengandung karakter [ dan ]',
+        });
+      }
       const update = { [command]: value };
       await firebase.setConfig(update);
       const updatedConfig = await firebase.getConfig();
