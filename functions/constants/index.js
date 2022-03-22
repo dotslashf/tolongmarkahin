@@ -45,7 +45,7 @@ module.exports = {
       alias: ['/sc'],
       help: '/setConfig defaultFolder [namafolder] | password [passwordBaru]',
       description:
-        'Mengubah config default folder atau password, tanpa karakter [ dan ]',
+        'Mengubah config default folder atau password, tanpa karakter [ dan ]\n cth:\nMengubah password:\n\n /setConfig password passwordBaru \nMengubah default folder:\n\n /setConfig defaultFolder namaFolder',
     },
   ],
 };
