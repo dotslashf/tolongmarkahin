@@ -52,7 +52,7 @@ function getBookmarkObject(message) {
   return {
     length: urls.length,
     userId,
-    folderName: isUrl ? null : fixCharFolderName(folderName),
+    folderName: isUrl ? null : folderName,
     text,
     tweets: urls.map(url => {
       return {
