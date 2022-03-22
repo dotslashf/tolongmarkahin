@@ -3,7 +3,7 @@ const { logger } = require('firebase-functions/v1');
 const serviceAccount = require('../serviceAccountKey.json');
 const bcryptjs = require('bcryptjs');
 
-class Firestore {
+class Firebase {
   constructor() {
     this.db = null;
     this.userId = null;

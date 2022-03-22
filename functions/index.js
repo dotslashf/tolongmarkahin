@@ -2,11 +2,11 @@ const functions = require('firebase-functions');
 const crypto = require('crypto');
 const { onEvent } = require('./utils/parser');
 const { validateSignature } = require('./utils/common');
-const Firestore = require('./services/firestore');
+const Firebase = require('./services/firebase');
 require('dotenv').config();
 
-const firestore = new Firestore();
-firestore.init();
+const firebase = new Firebase();
+firebase.init();
 
 exports.webhook = functions.https.onRequest((req, res) => {
   if (req.method === 'GET') {
@@ -38,7 +38,7 @@ exports.webhook = functions.https.onRequest((req, res) => {
       console.error(e);
     }
 
-    onEvent(firestore, req.body);
+    onEvent(firebase, req.body);
     return res.status(200).json({ status: 'Ok' });
   }
 });
