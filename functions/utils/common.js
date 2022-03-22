@@ -144,6 +144,24 @@ function formatListFolder(folders, folderName) {
   return folders.join('\n');
 }
 
+function formatFolderName(folderName) {
+  const re = new RegExp(
+    /(\w|\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g
+  );
+
+  let _folderName = folderName;
+  const result = _folderName.match(re);
+  result.filter(r => {
+    _folderName = _folderName.replace(r, '');
+  });
+  const forbiddenChars = _folderName.split('');
+  const finalFolderName = result.join('');
+  return {
+    formattedFolderName: finalFolderName,
+    forbiddenChars,
+  };
+}
+
 module.exports = {
   validateSignature,
   getBookmarkObject,
@@ -154,4 +172,5 @@ module.exports = {
   createCommandHash,
   formatListFolder,
   getRenameFolder,
+  formatFolderName,
 };

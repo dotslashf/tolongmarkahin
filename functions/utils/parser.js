@@ -7,6 +7,7 @@ const {
   createCommandHash,
   formatListFolder,
   getRenameFolder,
+  formatFolderName,
 } = require('./common');
 const Twitter = require('../services/twitter');
 const Firebase = require('../services/firebase');
@@ -75,8 +76,10 @@ async function onEvent(firebase, body) {
         .map(c => c.toLowerCase())
         .includes(command)
     ) {
-      const isFolderExist = await firebase.isFolderExist(folderName);
-      if (folderName === 'general') {
+      const { formattedFolderName, forbiddenChars } =
+        formatFolderName(folderName);
+      const isFolderExist = await firebase.isFolderExist(formattedFolderName);
+      if (formattedFolderName === 'general') {
         return await twitter.sendDirectMessage({
           type: 'error',
         });
@@ -84,19 +87,21 @@ async function onEvent(firebase, body) {
       if (isFolderExist) {
         return await twitter.sendDirectMessage({
           type: 'folderExist',
-          folderName,
+          folderName: formattedFolderName,
         });
       }
-      if (folderName.includes('[') || folderName.includes(']')) {
-        return await twitter.sendDirectMessage({
+      if (forbiddenChars) {
+        await twitter.sendDirectMessage({
           type: 'error',
-          text: 'nama folder tidak boleh mengandung karakter [ dan ]',
+          text: `nama folder mengandung karakter yang tidak diizinkan: ${forbiddenChars.join(
+            ', '
+          )}\n\n karakter tersebut akan dihapus`,
         });
       }
-      await firebase.createFolder(folderName);
+      await firebase.createFolder(formattedFolderName);
       await twitter.sendDirectMessage({
         type: 'tambahFolder',
-        folderName,
+        folderName: formattedFolderName,
       });
       return;
     }
@@ -108,25 +113,35 @@ async function onEvent(firebase, body) {
         .map(c => c.toLowerCase())
         .includes(command)
     ) {
-      const isFolderExist = await firebase.isFolderExist(folderName);
+      const { formattedFolderName, forbiddenChars } =
+        formatFolderName(folderName);
+      if (forbiddenChars) {
+        await twitter.sendDirectMessage({
+          type: 'error',
+          text: `nama folder mengandung karakter yang tidak diizinkan: ${forbiddenChars.join(
+            ', '
+          )}\n\n karakter tersebut akan dihapus`,
+        });
+      }
+      const isFolderExist = await firebase.isFolderExist(formattedFolderName);
       if (!isFolderExist) {
-        await firebase.createFolder(folderName);
+        await firebase.createFolder(formattedFolderName);
         await twitter.sendDirectMessage({
           type: 'tambahFolder',
-          folderName,
+          folderName: formattedFolderName,
         });
       }
 
       await Promise.all(
         tweets.map(async tweet => {
           const t = await twitter.checkTweetBookmark(tweet.tweetId);
-          await firebase.addBookmark(folderName, t);
+          await firebase.addBookmark(formattedFolderName, t);
         })
       );
       await twitter.sendDirectMessage({
         type: 'tambahBookmark',
         length,
-        folderName,
+        folderName: formattedFolderName,
       });
       return;
     }
@@ -178,12 +193,17 @@ async function onEvent(firebase, body) {
         return;
       }
       let { command, value } = getSetConfigCommand(text);
-      if (value.includes('[') || value.includes(']')) {
-        await twitter.sendDirectMessage({
-          type: 'error',
-          text: 'nama folder tidak boleh mengandung karakter [ dan ]',
-        });
-        return;
+      if (command === 'defaultFolder') {
+        const { formattedFolderName, forbiddenChars } = formatFolderName(value);
+        if (forbiddenChars) {
+          await twitter.sendDirectMessage({
+            type: 'error',
+            text: `nama folder mengandung karakter yang tidak diizinkan: ${forbiddenChars.join(
+              ', '
+            )}\n\n karakter tersebut akan dihapus`,
+          });
+        }
+        value = formattedFolderName;
       }
       const update = { [command]: value };
       await firebase.setConfig(update);
@@ -216,41 +236,51 @@ async function onEvent(firebase, body) {
         });
         return;
       }
-      if (
-        oldName.includes('[') ||
-        oldName.includes(']') ||
-        newName.includes('[') ||
-        newName.includes(']')
-      ) {
+      const {
+        formattedFolderName: formattedOldFolderName,
+        forbiddenChars: forbiddenCharsOldName,
+      } = formatFolderName(oldName);
+      const {
+        formattedFolderName: formattedNewFolderName,
+        forbiddenChars: forbiddenCharsNewName,
+      } = formatFolderName(newName);
+      if (forbiddenCharsNewName || forbiddenCharsOldName) {
         await twitter.sendDirectMessage({
           type: 'error',
-          text: 'nama folder tidak boleh mengandung karakter [ dan ]',
+          text: `nama folder mengandung karakter yang tidak diizinkan: ${
+            forbiddenCharsOldName
+              ? forbiddenCharsOldName.join(', ')
+              : forbiddenCharsNewName.join(', ')
+          }\n\n karakter tersebut akan dihapus`,
         });
-        return;
       }
-      const isFolderExist = await firebase.isFolderExist(oldName);
+      const isFolderExist = await firebase.isFolderExist(
+        formattedOldFolderName
+      );
       if (!isFolderExist) {
         await twitter.sendDirectMessage({
           type: 'folderNotExist',
-          folderName: oldName,
+          folderName: formattedOldFolderName,
         });
         return;
       }
-      const isFolderNewExist = await firebase.isFolderExist(newName);
+      const isFolderNewExist = await firebase.isFolderExist(
+        formattedNewFolderName
+      );
       if (isFolderNewExist) {
         await twitter.sendDirectMessage({
           type: 'folderExist',
-          folderName: newName,
+          folderName: formattedNewFolderName,
         });
         return;
       }
-      const bookmarks = await firebase.getAllBookmarks(oldName);
-      await firebase.moveBookmark(newName, bookmarks);
-      await firebase.deleteCollection(oldName);
+      const bookmarks = await firebase.getAllBookmarks(formattedOldFolderName);
+      await firebase.moveBookmark(formattedNewFolderName, bookmarks);
+      await firebase.deleteCollection(formattedOldFolderName);
       await twitter.sendDirectMessage({
         type: 'renameFolder',
-        folderName: oldName,
-        text: newName,
+        folderName: formattedOldFolderName,
+        text: formattedNewFolderName,
       });
       const folders = await firebase.getFolders();
       const foldersText = formatListFolder(folders, config.defaultFolder);
