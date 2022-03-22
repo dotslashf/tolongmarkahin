@@ -341,7 +341,7 @@ async function onEvent(firebase, body) {
       await firebase.deleteCollection(formattedFolderName);
       await twitter.sendDirectMessage({
         type: 'deleteFolder',
-        folderName: formatFolderName,
+        folderName: formattedFolderName,
       });
       const folders = await firebase.getFolders();
       const foldersText =
