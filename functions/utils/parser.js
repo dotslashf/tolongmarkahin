@@ -8,15 +8,15 @@ const {
   formatListFolder,
 } = require('./common');
 const Twitter = require('../services/twitter');
-const Firestore = require('../services/firestore');
+const Firebase = require('../services/firebase');
 
 /**
  *
- * @param {Firestore} firestore | Firestore object class
+ * @param {Firebase} firebase | Firebase object class
  * @param {*} body
  * @returns
  */
-async function onEvent(firestore, body) {
+async function onEvent(firebase, body) {
   const { direct_message_events, follow_events } = body;
   if (!follow_events && !direct_message_events) {
     return;
@@ -39,11 +39,11 @@ async function onEvent(firestore, body) {
   let { length, tweets, userId, folderName, text } = getBookmarkObject(message);
 
   try {
-    firestore.setUserId(userId);
-    const isFirstTime = await firestore.isFirstTime();
+    firebase.setUserId(userId);
+    const isFirstTime = await firebase.isFirstTime();
     if (isFirstTime) {
       const user = await twitter.getUserProfile(userId);
-      const defaultConfig = await firestore.createConfig(
+      const defaultConfig = await firebase.createConfig(
         user.screen_name,
         folderName
       );
@@ -56,7 +56,7 @@ async function onEvent(firestore, body) {
         text: formatJson(defaultConfig),
       });
     }
-    const config = await firestore.getConfig();
+    const config = await firebase.getConfig();
     folderName = folderName || config.defaultFolder;
     const command = getCommand(text);
 
@@ -74,7 +74,7 @@ async function onEvent(firestore, body) {
         .map(c => c.toLowerCase())
         .includes(command)
     ) {
-      const isFolderExist = await firestore.isFolderExist(folderName);
+      const isFolderExist = await firebase.isFolderExist(folderName);
       if (folderName === 'general') {
         return twitter.sendMessage({
           type: 'error',
@@ -86,7 +86,7 @@ async function onEvent(firestore, body) {
           folderName,
         });
       }
-      await firestore.createFolder(folderName);
+      await firebase.createFolder(folderName);
       await twitter.sendDirectMessage({
         type: 'tambahFolder',
         folderName,
@@ -101,9 +101,9 @@ async function onEvent(firestore, body) {
         .map(c => c.toLowerCase())
         .includes(command)
     ) {
-      const isFolderExist = await firestore.isFolderExist(folderName);
+      const isFolderExist = await firebase.isFolderExist(folderName);
       if (!isFolderExist) {
-        await firestore.createFolder(folderName);
+        await firebase.createFolder(folderName);
         await twitter.sendDirectMessage({
           type: 'tambahFolder',
           folderName,
@@ -113,7 +113,7 @@ async function onEvent(firestore, body) {
       await Promise.all(
         tweets.map(async tweet => {
           const t = await twitter.checkTweetBookmark(tweet.tweetId);
-          await firestore.addBookmark(folderName, t);
+          await firebase.addBookmark(folderName, t);
         })
       );
       await twitter.sendDirectMessage({
@@ -136,7 +136,7 @@ async function onEvent(firestore, body) {
         .map(c => c.toLowerCase())
         .includes(command)
     ) {
-      const folders = await firestore.getFolders();
+      const folders = await firebase.getFolders();
       const foldersText = formatListFolder(folders, config.defaultFolder);
       await twitter.sendDirectMessage({
         type: 'listFolder',
@@ -171,8 +171,8 @@ async function onEvent(firestore, body) {
       }
       let { command, value } = getSetConfigCommand(text);
       const update = { [command]: value };
-      await firestore.setConfig(update);
-      const updatedConfig = await firestore.getConfig();
+      await firebase.setConfig(update);
+      const updatedConfig = await firebase.getConfig();
       await twitter.sendDirectMessage({
         type: 'config',
         text: formatJson(updatedConfig),
@@ -184,7 +184,7 @@ async function onEvent(firestore, body) {
       await Promise.all(
         tweets.map(async tweet => {
           const t = await twitter.checkTweetBookmark(tweet.tweetId);
-          await firestore.addBookmark(folderName, t);
+          await firebase.addBookmark(folderName, t);
           return;
         })
       );
