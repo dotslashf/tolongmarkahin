@@ -244,7 +244,10 @@ async function onEvent(firebase, body) {
         formattedFolderName: formattedNewFolderName,
         forbiddenChars: forbiddenCharsNewName,
       } = formatFolderName(newName);
-      if (forbiddenCharsNewName || forbiddenCharsOldName) {
+      if (
+        forbiddenCharsNewName.length > 0 ||
+        forbiddenCharsOldName.length > 0
+      ) {
         await twitter.sendDirectMessage({
           type: 'error',
           text: `nama folder mengandung karakter yang tidak diizinkan: ${
@@ -289,7 +292,7 @@ async function onEvent(firebase, body) {
         text: formattedNewFolderName,
       });
       const folders = await firebase.getFolders();
-      const foldersText = formatListFolder(folders, config.defaultFolder);
+      const foldersText = formatListFolder(folders, formattedNewFolderName);
       await twitter.sendDirectMessage({
         type: 'listFolder',
         text: foldersText,

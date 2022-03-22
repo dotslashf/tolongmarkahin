@@ -106,7 +106,6 @@ class Firebase {
 
   async setConfig({ defaultFolder, password }) {
     const config = await this.getConfig();
-    console.log('password', password);
     if (password) {
       const hashedPassword = bcryptjs.hashSync(password);
       password = hashedPassword;
