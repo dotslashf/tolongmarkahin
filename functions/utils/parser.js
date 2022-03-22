@@ -274,6 +274,12 @@ async function onEvent(firebase, body) {
         });
         return;
       }
+      if (
+        config.defaultFolder === oldName ||
+        config.defaultFolder === formattedOldFolderName
+      ) {
+        await firebase.setConfig({ defaultFolder: formattedNewFolderName });
+      }
       const bookmarks = await firebase.getAllBookmarks(formattedOldFolderName);
       await firebase.moveBookmark(formattedNewFolderName, bookmarks);
       await firebase.deleteCollection(formattedOldFolderName);
