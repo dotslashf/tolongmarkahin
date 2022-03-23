@@ -58,6 +58,9 @@ async function onEvent(firebase, body) {
         type: 'config',
         text: formatJson(defaultConfig),
       });
+      await twitter.sendDirectMessage({
+        type: 'link',
+      });
     }
     const config = await firebase.getConfig();
     folderName = folderName || config.defaultFolder;
@@ -361,7 +364,18 @@ async function onEvent(firebase, body) {
         text: foldersText,
       });
     }
-
+    //web
+    if (
+      commandHash['/web']
+        .concat('/web')
+        .map(c => c.toLowerCase())
+        .includes(command)
+    ) {
+      await twitter.sendDirectMessage({
+        type: 'link',
+      });
+      return;
+    }
     if (!command && length > 0) {
       // add bookmark ke folder default
       await Promise.all(

@@ -61,5 +61,11 @@ module.exports = {
       description:
         'Menghapus folder dan semua bookmark yang ada di dalamnya, nama folder tidak boleh menggunakan spasi, tanpa karakter [ dan ]',
     },
+    {
+      command: '/web',
+      alias: ['/app', '/link'],
+      help: 'mengirim link web',
+      description: 'mengirim link web',
+    },
   ],
 };

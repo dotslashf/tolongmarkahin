@@ -98,6 +98,9 @@ class Twitter {
       case 'listFolder':
         msg = `📂 List folder: \n\n${text} \n\nfolder dengan emoji ✨ adalah folder default`;
         break;
+      case 'link':
+        msg = `https://tolongmarkahin.vercel.app/`;
+        break;
     }
 
     return new Promise((resolve, reject) => {
